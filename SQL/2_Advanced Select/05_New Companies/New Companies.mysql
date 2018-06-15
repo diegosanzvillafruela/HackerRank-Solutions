@@ -1,10 +1,26 @@
 /*
 Working platform:- DB2, MySQL, Oracle, MS SQL Server
-*/
 SELECT COMPANY_CODE, FOUNDER,
 (SELECT COUNT(DISTINCT LEAD_MANAGER_CODE) FROM LEAD_MANAGER WHERE COMPANY_CODE = C.COMPANY_CODE),
 (SELECT COUNT(DISTINCT SENIOR_MANAGER_CODE) FROM SENIOR_MANAGER WHERE COMPANY_CODE = C.COMPANY_CODE),
 (SELECT COUNT(DISTINCT MANAGER_CODE) FROM MANAGER WHERE COMPANY_CODE = C.COMPANY_CODE),
 (SELECT COUNT(DISTINCT EMPLOYEE_CODE) FROM EMPLOYEE WHERE COMPANY_CODE = C.COMPANY_CODE)
 FROM COMPANY C
+ORDER BY COMPANY_CODE;
+*/
+
+-- I think it is more efficient
+select company_code, founder, lead_manager_number, senior_manager_number, manager_number, employee_number  
+  from 
+      COMPANY 
+             JOIN 
+      (SELECT company_code, 
+          count(DISTINCT lead_manager_code) as lead_manager_number, 
+          count(DISTINCT senior_manager_code) as senior_manager_number, 
+          count(DISTINCT manager_code) as manager_number,
+          count(DISTINCT employee_code) as employee_number 
+            FROM 
+              (COMPANY NATURAL JOIN Lead_Manager) 
+                NATURAL JOIN Senior_Manager NATURAL JOIN  Manager NATURAL JOIN Employee group by company_code) 
+      using ( company_code)
 ORDER BY COMPANY_CODE;
